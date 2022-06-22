@@ -1,0 +1,76 @@
+from fastapi import FastAPI
+
+import sqlalchemy as base
+motor = base.create_engine('mssql+pyodbc://sa:administrador@localhost/D?driver=SQL+Server')
+conexion = motor.connect()
+metadata = base.MetaData()
+registros = base.Table('registros', metadata, autoload=True, autoload_with=motor)
+
+app = FastAPI()
+
+
+@app.get("/agregar/")
+async def agregar(temperatura, humedad, ubicacion):
+    query = base.insert(registros).values(temperatura = temperatura, humedad = humedad, ubicacion = ubicacion)
+    ResultProxy = conexion.execute(query)
+
+
+@app.get("/obtenerMaxTemp")
+async def maxTemp():
+    query = base.select(registros).order_by(base.desc(registros.columns.temperatura)).limit(1)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMinTemp")
+async def minTemp():
+    query = base.select(registros).order_by(base.asc(registros.columns.temperatura)).limit(1)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMaxHumedad")
+async def maxHumedad():
+    query = base.select(registros).order_by(base.desc(registros.columns.humedad)).limit(1)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMinHumedad")
+async def minHumedad():
+    query = base.select(registros).order_by(base.asc(registros.columns.humedad)).limit(1)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMaxTemp/{cantidad}")
+async def maxTempCantidad(cantidad):
+    query = base.select(registros).order_by(base.desc(registros.columns.temperatura)).limit(cantidad)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMinTemp/{cantidad}")
+async def minTempCantidad(cantidad):
+    query = base.select(registros).order_by(base.asc(registros.columns.temperatura)).limit(cantidad)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMaxHumedad/{cantidad}")
+async def maxHumedadCantidad(cantidad):
+    query = base.select(registros).order_by(base.desc(registros.columns.humedad)).limit(cantidad)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerMinHumedad/{cantidad}")
+async def minHumedadCantidad(cantidad):
+    query = base.select(registros).order_by(base.asc(registros.columns.humedad)).limit(cantidad)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerTemperaturaPorUbicacion/{ubicacion}")
+async def obtenerTemperaturaPorUbicacion(ubicacion):
+    query = base.select(registros).where(registros.columns.ubicacion==ubicacion).order_by(base.asc(registros.columns.fecha)).limit(10)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
+
+@app.get("/obtenerHumedadPorUbicacion/{ubicacion}")
+async def obtenerHumedadPorUbicacion(ubicacion):
+    query = base.select(registros.columns.humedad).where(registros.columns.ubicacion==ubicacion).order_by(base.asc(registros.columns.fecha)).limit(10)
+    ResultProxy = conexion.execute(query)
+    return ResultProxy.all()
