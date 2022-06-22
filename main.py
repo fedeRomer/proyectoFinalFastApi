@@ -24,9 +24,9 @@ app = FastAPI()
 #Pass mysql: check discord
 
 # Define the engine using MYSQL Connector/Python
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://USER:PASSWORD@***check discord:3306/te_pilar_grp1'
+#SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://USER:PASSWORD@***check discord:3306/te_pilar_grp1'
 # Check Conn
-engine = sqlalchemy.create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
+#engine = sqlalchemy.create_engine(SQLALCHEMY_DATABASE_URI, echo=True)
 
 ##
 """ Consigna para tener resuelta para la semana que viene
@@ -56,25 +56,27 @@ Método temp_by_location: devuelve los últimos 10 registros de temperatura de l
 Método hum_by_location: devuelve los últimos 10 registros de humedad de la ubicación especificada
  """
 
+
+class Temperature(BaseModel):
+    temperatureValue: float
+
+class Humidity(BaseModel):
+    humidityValue: float
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.post("/querytest")
-def run_query():
-
-    
-    
-    return {print(engine.table_names())}
-
 @app.post("/saveTemperature")
-def save(temperature):
+def save(temperature: Temperature):
 
-    
+    #doSave
     return{"temperature": temperature}
+
+
+@app.post("/saveHumidity")
+def save(humidity: Humidity):
+
+    #doSave
+    return{"humidity": humidity}
